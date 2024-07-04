@@ -1,0 +1,17 @@
+AllCops:
+  TargetRubyVersion: 2.7
+
+Style/WordArray:
+  Enabled: false
+
+Naming/MethodParameterName:
+  Enabled: false
+
+Style/NumericLiterals:
+  Enabled: false
+
+Metrics/ModuleLength:
+  Enabled: false
+
+Metrics/MethodLength:
+  Enabled: false

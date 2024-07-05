@@ -17,4 +17,6 @@ Gem::Specification.new do |s|
   end
 
   s.required_ruby_version = '>= 2.7.0'
+
+  s.add_development_dependency 'rspec', '~> 3.0'
 end

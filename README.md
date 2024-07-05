@@ -50,7 +50,7 @@ UniqueNamesGenerator.generate([:colors, drinks])
 
 ### Config options
 
-UniqueNamesGenerator can be used with either the default provided config (`separator: '_', style: :lowercase, creativity: 0 }`) or by specifying any of your own configuration options for seeding, seperator, style and creativity.
+UniqueNamesGenerator can be used with either the default provided config (`separator: '_', style: :lowercase, creativity: 0`) or by specifying any of your own configuration options for seeding, seperator, style and creativity.
 
 #### More details on possible options
 

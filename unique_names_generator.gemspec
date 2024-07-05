@@ -5,8 +5,12 @@ require_relative 'lib/unique_names_generator/version'
 Gem::Specification.new do |s|
   s.name          = 'unique_names_generator'
   s.version       = UniqueNamesGenerator::VERSION
-  s.summary       = 'Ruby library for generating unique names'
-  s.description   = 'Generate random and unique names utilizing PRNG with seeds support'
+  s.summary       = 'Ruby library for generating random and unique names'
+  s.description = <<~DESC
+    Generate random and unique names in Ruby with support for PRNG
+    seeded/deterministic generation using a built in collection of
+    dictionaries, or your own.
+  DESC
   s.authors       = ['Jon Girard']
   s.email         = 'jongirard03@gmail.com'
   s.homepage      = 'https://github.com/jongirard/unique_names_generator_ruby'

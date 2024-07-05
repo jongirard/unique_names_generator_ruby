@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module UniqueNamesGenerator
-  # Generate a seed from a string
+  # Generate a reproducible seed from a given string
   module Seed
     class << self
       def generate_seed(seed)
@@ -11,6 +11,8 @@ module UniqueNamesGenerator
         seed_decimal = mulberry32(transformed_string)
         remove_decimal(seed_decimal)
       end
+
+      private
 
       def transform_string(seed)
         return seed if seed.is_a?(Integer)

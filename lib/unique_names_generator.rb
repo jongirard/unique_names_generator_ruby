@@ -17,10 +17,15 @@ require_relative './unique_names_generator/dictionaries/star_wars'
 module UniqueNamesGenerator
   module_function
 
-  def generate(dictionaries, separator: '_', style: :lowercase, seed: nil)
+  def generate(dictionaries, separator: '_', style: :lowercase, seed: nil, creativity: 0)
     @separator = separator
     @style = style
     @seed = seed
+    @creativity = creativity
+
+    if creativity.negative? || creativity > 10
+      raise ArgumentError, 'Outside creativity range. Must be between 0 and 10.'
+    end
 
     generate_name(dictionaries)
   end
@@ -86,6 +91,14 @@ module UniqueNamesGenerator
   end
 
   def generate_name(dictionaries)
+    if @creativity.nil? || @creativity.zero?
+      generate_name_original(dictionaries)
+    else
+      generate_name_creatively(dictionaries)
+    end
+  end
+
+  def generate_name_original(dictionaries)
     map_dictionaries(dictionaries).reduce(nil) do |acc, x|
       rnd = (random_seeded_float * x.length).floor
       original_word = x[rnd]
@@ -98,6 +111,33 @@ module UniqueNamesGenerator
       else
         word
       end
+    end
+  end
+
+  def generate_name_creatively(dictionaries)
+    word_lists = map_dictionaries(dictionaries)
+
+    word_lists.each_with_index.reduce(nil) do |acc, (word_list, index)|
+      creativity = calculate_creativity(index)
+      rnd = (random_seeded_float * word_list.length * creativity).floor
+      original_word = word_list[rnd % word_list.length] # Ensure we don't go out of bounds
+
+      word = format_with_separator(original_word)
+      word = format_multi_word(word, original_word)
+
+      if acc
+        "#{acc}#{@separator}#{word}"
+      else
+        word
+      end
+    end
+  end
+
+  def calculate_creativity(index)
+    if index.zero?
+      @creativity # Base creativity for the first dictionary
+    else
+      @creativity * (2 + index * 0.5) # Increase creativity for subsequent dictionaries
     end
   end
 
@@ -146,6 +186,9 @@ module UniqueNamesGenerator
       format_parts
       format_word
       split_with_separator
+      generate_name_original
+      generate_name_creatively
+      calculate_creativity
     ]
   )
 end

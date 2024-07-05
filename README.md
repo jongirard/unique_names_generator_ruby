@@ -12,7 +12,7 @@ by adding `unique_names_generator` to your list of gemfile dependencies:
 Add this line to your application's Gemfile:
 
 ```
-gem 'unique_names_generator', "~> 0.1.1"
+gem 'unique_names_generator', "~> 0.1.2"
 ```
 
 And then execute:

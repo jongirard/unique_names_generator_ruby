@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'lib/unique_names_generator/version'
+require_relative 'lib/unique_names_generator/version'
 
 Gem::Specification.new do |s|
   s.name          = 'unique_names_generator'

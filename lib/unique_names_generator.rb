@@ -103,14 +103,7 @@ module UniqueNamesGenerator
       rnd = (random_seeded_float * x.length).floor
       original_word = x[rnd]
 
-      word = format_with_separator(original_word)
-      word = format_multi_word(word, original_word)
-
-      if acc
-        "#{acc}#{@separator}#{word}"
-      else
-        word
-      end
+      output_word(acc, original_word)
     end
   end
 
@@ -122,14 +115,18 @@ module UniqueNamesGenerator
       rnd = (random_seeded_float * word_list.length * creativity).floor
       original_word = word_list[rnd % word_list.length] # Ensure we don't go out of bounds
 
-      word = format_with_separator(original_word)
-      word = format_multi_word(word, original_word)
+      output_word(acc, original_word)
+    end
+  end
 
-      if acc
-        "#{acc}#{@separator}#{word}"
-      else
-        word
-      end
+  def output_word(acc, original_word)
+    word = format_with_separator(original_word)
+    word = format_multi_word(word, original_word)
+
+    if acc
+      "#{acc}#{@separator}#{word}"
+    else
+      word
     end
   end
 
@@ -189,6 +186,7 @@ module UniqueNamesGenerator
       generate_name_original
       generate_name_creatively
       calculate_creativity
+      output_word
     ]
   )
 end

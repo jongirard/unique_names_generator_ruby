@@ -1,3 +1,5 @@
+![Ruby CI](https://github.com/jongirard/unique_names_generator_ruby/actions/workflows/ruby.yml/badge.svg)
+
 # UniqueNamesGenerator
 
 Unique Names Generator is a Ruby package for generating random and unique names. Generation utilizes PRNG (pseudo random number generation) for either fully random or seeded name generation. It comes with a list of various dictionaries out of the box, but you can also provide custom ones. Inspired by the great "Unique Names Generator" available on [NPM](https://www.npmjs.com/package/unique-names-generator) by Andrea Sonny. Ported from the [Elixir version](https://github.com/jongirard/unique_names_generator) built by myself.

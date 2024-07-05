@@ -14,6 +14,8 @@ Gem::Specification.new do |s|
   s.authors       = ['Jon Girard']
   s.email         = 'jongirard03@gmail.com'
   s.homepage      = 'https://github.com/jongirard/unique_names_generator_ruby'
+  s.metadata      = { 'homepage_uri' => 'https://github.com/jongirard/unique_names_generator_ruby',
+                      'source_code_uri' => 'https://github.com/jongirard/unique_names_generator_ruby' }
   s.require_paths = ['lib']
   s.license       = 'MIT'
   s.files         = Dir.chdir(File.expand_path(__dir__)) do

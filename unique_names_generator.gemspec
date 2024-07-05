@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
     `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
   end
 
-  s.required_ruby_version = '>= 2.7.0'
+  s.required_ruby_version = '>= 2.6.0'
 
   s.add_development_dependency 'rspec', '~> 3.0'
 end

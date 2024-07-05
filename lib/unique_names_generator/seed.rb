@@ -13,7 +13,7 @@ module UniqueNamesGenerator
       end
 
       def transform_string(seed)
-        return seed if seed.integer?
+        return seed if seed.is_a?(Integer)
 
         seed += "\x00"
         ascii_values = seed.bytes
@@ -27,27 +27,13 @@ module UniqueNamesGenerator
       end
 
       def mulberry32(seed)
-        t = seed + 0x6d2b79f5
+        t = (seed + 0x6d2b79f5) & 0xffffffff
 
-        t = imul(bxor(t, bsr(t, 15)), t | 1)
-        t = bxor(t, bsr(t, 7))
-        t = bxor(t, t + imul(bxor(t, bsr(t, 7)), t | 61))
+        t = ((t ^ (t >> 15)) * (t | 1)) & 0xffffffff
+        t = (t ^ (t >> 7)) & 0xffffffff
+        t = (t ^ (t + ((t ^ (t >> 7)) * (t | 61) & 0xffffffff))) & 0xffffffff
 
-        bxor(t, bsr(t, 14)) / 4294967296.0
-      end
-
-      private
-
-      def imul(a, b)
-        (a * b) & 0xFFFFFFFF
-      end
-
-      def bxor(a, b)
-        a ^ b
-      end
-
-      def bsr(a, b)
-        a >> b
+        ((t ^ (t >> 14)) & 0xffffffff) / 4294967296.0
       end
     end
   end

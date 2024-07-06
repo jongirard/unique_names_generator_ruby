@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
   s.homepage      = 'https://github.com/jongirard/unique_names_generator_ruby'
   s.metadata      = { 'homepage_uri' => 'https://github.com/jongirard/unique_names_generator_ruby',
                       'source_code_uri' => 'https://github.com/jongirard/unique_names_generator_ruby',
-                      'documentation_uri' => 'https://jongirard.github.io/unique_names_generator_ruby' }
+                      'documentation_uri' => 'https://www.rubydoc.info/gems/unique_names_generator/' }
   s.require_paths = ['lib']
   s.license       = 'MIT'
   s.files         = Dir.chdir(File.expand_path(__dir__)) do

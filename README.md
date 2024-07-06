@@ -64,7 +64,7 @@ UniqueNamesGenerator can be used with either the default provided config (`separ
 - **Separator**: [String] Character(s) used to join words in the generated name. Default: '_'. `nil` can be used for no space.
   - ex: '_', '-', ' ' or `nil` for no space.
 - **Style**: [Symbol] Capitalization style for generated names.
-  - Options: :lowercase, :uppercase, :capital. Default: :lowercase
+  - Options: `:lowercase`, `:uppercase`, `:capital`. Default: `:lowercase`
 - **Creativity**: [Integer] Level of creativity in name generation, affecting word selection. Must be between 0 and 10. A Float value can also be used. Default: 0
 
 ```ruby

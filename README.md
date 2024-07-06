@@ -12,7 +12,7 @@ by adding `unique_names_generator` to your list of gemfile dependencies:
 Add this line to your application's Gemfile:
 
 ```
-gem 'unique_names_generator', "~> 0.1.2"
+gem 'unique_names_generator', '~> 0.2.0'
 ```
 
 And then execute:
@@ -29,16 +29,19 @@ $ gem install unique_names_generator
 
 ## Usage
 
-In a nutshell, you can begin generating randon names with UniqueNamesGenerator by simply specifying an array of one or more dictionaries via `UniqueNamesGenerator.generate`. Available dictionary types are `[:adjectives, :animals, :colors, :languages, :names, :numbers, :star_wars]`.
+In a nutshell, you can begin generating random names with UniqueNamesGenerator by simply creating a Generator instance and specifying an array of one or more dictionaries. Available dictionary types are `[:adjectives, :animals, :colors, :languages, :names, :numbers, :star_wars]`.
 
 ```ruby
-UniqueNamesGenerator.generate([:adjectives, :animals])
+generator = UniqueNamesGenerator::Generator.new([:adjectives, :animals])
+generator.generate
 # => Generates ex: "dramatic_limpet"
 
-UniqueNamesGenerator.generate([:adjectives, :colors, :animals])
+generator = UniqueNamesGenerator::Generator.new([:adjectives, :colors, :animals])
+generator.generate
 # => Generates ex: "tremendous_brown_cat"
 
-UniqueNamesGenerator.generate([:adjectives, :names, :numbers])
+generator = UniqueNamesGenerator::Generator.new([:adjectives, :names, :numbers])
+generator.generate
 # => Generates ex: "doubtful_wanda_979"
 ```
 
@@ -46,7 +49,9 @@ To use custom dictionaries, simply include your array of strings as part of the 
 
 ```ruby
 drinks = ['Sprite', 'Coca-Cola', 'Juice', 'Tea']
-UniqueNamesGenerator.generate([:colors, drinks])
+
+generator = UniqueNamesGenerator::Generator.new([:colors, drinks])
+generator.generate
 # => Generates ex: "cyan_sprite"
 ```
 
@@ -55,17 +60,20 @@ UniqueNamesGenerator.generate([:colors, drinks])
 UniqueNamesGenerator can be used with either the default provided config (`separator: '_', style: :lowercase, creativity: 0`) or by specifying any of your own configuration options for seeding, seperator, style and creativity.
 
 #### More details on possible options
-
-- **Separator options**: Any ASCII character string such as underscore, dash or blank space. `nil` for no space.
+- **Dictionaries**: [Array<Symbol, Array<String>>] List of dictionaries to use for name generation. Can be symbols referring to built-in dictionaries or custom arrays of strings.
+- **Separator**: [String] Character(s) used to join words in the generated name. Default: '_'. `nil` can be used for no space.
   - ex: '_', '-', ' ' or `nil` for no space.
-- **Style options**: Atom, one of `:lowercase`, `:uppercase`, `:capital`.
-- **Creativity options**: An integer or float between 1 and 10.
+- **Style**: [Symbol] Capitalization style for generated names.
+  - Options: :lowercase, :uppercase, :capital. Default: :lowercase
+- **Creativity**: [Integer] Level of creativity in name generation, affecting word selection. Must be between 0 and 10. A Float value can also be used. Default: 0
 
 ```ruby
-UniqueNamesGenerator.generate([:colors, :animals], style: :capital, separator: ' ')
+generator = UniqueNamesGenerator::Generator.new([:colors, :animals], style: :capital, separator: ' ')
+generator.generate
 # => Generates ex: "Lavender Marlin"
 
-UniqueNamesGenerator.generate([:colors, :adjectives, :animals], creativity: 8, style: :capital, separator: ' ')
+generator = UniqueNamesGenerator::Generator.new([:colors, :adjectives, :animals], creativity: 8, style: :capital, separator: ' ')
+generator.generate
 # => Generates ex: "Yellow Local Hippopotamus"
 ```
 
@@ -73,20 +81,22 @@ UniqueNamesGenerator.generate([:colors, :adjectives, :animals], creativity: 8, s
 Using the creativity option changes how `UniqueNamesGenerator` selects terms from the dictionaries in use, essentially acting as a multiplier. For dictionaries with a similar term length, while using a seed, the selection may at times appear to be alphabetical or closely related (ex: "Amber Anakin Skywalker"). Utilizing the `creative` option with a value between 1 and 10 will use a sequential multiplier for subsequent dictionaries providing a seemingly more "random" or "creative" result whilst still allowing for seeded generation.
 
 ```ruby
-UniqueNamesGenerator.generate([:colors, :adjectives, :animals], creativity: 8, seed: 'f6da7a28-5ae6-4d6b-b3b8-a197b99ed4eb')
+generator = UniqueNamesGenerator::Generator.new([:colors, :adjectives, :animals], creativity: 8)
+generator.generate(seed: 'f6da7a28-5ae6-4d6b-b3b8-a197b99ed4eb')
 
 # => Seed "f6da7a28-5ae6-4d6b-b3b8-a197b99ed4eb" with creativity of 8 always generates: "plum_flying_cobra"
 ```
 
 ### Seeded Generation
 
-A seed can be used to deterministically generate a name. As long as the provided seed and creativity values are the same between runs, then the generated name will also always be the same. Simply provide a string or integer as the value of the seed key, ie; `seed: 'hello'`. 
+A seed can be used to deterministically generate a name. As long as the provided seed and creativity values are the same between runs, then the generated name will also always be the same. Simply provide a string or integer as an argument to the generate method, ie; `seed: 'hello'`. 
 
-_(**Usecase example:** generate a username for an authenticated user based on UUID. Ex: `13a5d03e-61d0-4b5b-ae3b-57953c268c5f` will always generate the name "beige_boba_fett_145" when used together with the colors/star_wars/numbers dictionaries)._
+_(**Usecase example:** generate a username for an authenticated user based on UUID. Ex: `13a5d03e-61d0-4b5b-ae3b-57953c268c5f` will always generate the name "coral_greedo_320" when used together with the colors/star_wars/numbers dictionaries)._
 
 ```ruby
-UniqueNamesGenerator.generate([:colors, :star_wars, :numbers], seed: '13a5d03e-61d0-4b5b-ae3b-57953c268c5f')
-# => Seed "13a5d03e-61d0-4b5b-ae3b-57953c268c5f" always generates: "beige_boba_fett_145"
+generator = UniqueNamesGenerator::Generator.new([:colors, :star_wars, :numbers])
+generator.generate(seed: '13a5d03e-61d0-4b5b-ae3b-57953c268c5f')
+# => Seed "13a5d03e-61d0-4b5b-ae3b-57953c268c5f" always generates: "coral_greedo_320"
 ```
 
 ## License

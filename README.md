@@ -34,14 +34,17 @@ In a nutshell, you can begin generating random names with UniqueNamesGenerator b
 ```ruby
 generator = UniqueNamesGenerator::Generator.new([:adjectives, :animals])
 generator.generate
+
 # => Generates ex: "dramatic_limpet"
 
 generator = UniqueNamesGenerator::Generator.new([:adjectives, :colors, :animals])
 generator.generate
+
 # => Generates ex: "tremendous_brown_cat"
 
 generator = UniqueNamesGenerator::Generator.new([:adjectives, :names, :numbers])
 generator.generate
+
 # => Generates ex: "doubtful_wanda_979"
 ```
 
@@ -52,6 +55,7 @@ drinks = ['Sprite', 'Coca-Cola', 'Juice', 'Tea']
 
 generator = UniqueNamesGenerator::Generator.new([:colors, drinks])
 generator.generate
+
 # => Generates ex: "cyan_sprite"
 ```
 
@@ -70,10 +74,12 @@ UniqueNamesGenerator can be used with either the default provided config (`separ
 ```ruby
 generator = UniqueNamesGenerator::Generator.new([:colors, :animals], style: :capital, separator: ' ')
 generator.generate
+
 # => Generates ex: "Lavender Marlin"
 
 generator = UniqueNamesGenerator::Generator.new([:colors, :adjectives, :animals], creativity: 8, style: :capital, separator: ' ')
 generator.generate
+
 # => Generates ex: "Yellow Local Hippopotamus"
 ```
 
@@ -96,6 +102,7 @@ _(**Usecase example:** generate a username for an authenticated user based on UU
 ```ruby
 generator = UniqueNamesGenerator::Generator.new([:colors, :star_wars, :numbers])
 generator.generate(seed: '13a5d03e-61d0-4b5b-ae3b-57953c268c5f')
+
 # => Seed "13a5d03e-61d0-4b5b-ae3b-57953c268c5f" always generates: "coral_greedo_320"
 ```
 

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # An implementation of a unique_names_generator in Ruby
-# with support for PRNG/seeds
+# with support for PRNG/deterministic seeds
 
 require_relative './unique_names_generator/seed'
 
@@ -15,23 +15,32 @@ require_relative './unique_names_generator/dictionaries/star_wars'
 
 # UniqueNamesGenerator implementation
 module UniqueNamesGenerator
-  module_function
+  # UniqueNamesGenerator::Generator
+  #
+  # This class generates unique names based on specified dictionaries and configuration options.
+  # It allows for customizable name generation with various styles, separators, and creativity levels.
+  class Generator
+    def initialize(dictionaries, separator: '_', style: :lowercase, creativity: 0)
+      @dictionaries = dictionaries
+      @separator = separator
+      @style = style
+      @creativity = creativity
 
-  def generate(dictionaries, separator: '_', style: :lowercase, seed: nil, creativity: 0)
-    @separator = separator
-    @style = style
-    @seed = seed
-    @creativity = creativity
-
-    if creativity.negative? || creativity > 10
-      raise ArgumentError, 'Outside creativity range. Must be between 0 and 10.'
+      # Will raise error if any specified dictionary is invalid
+      dictionaries.map { |dictionary| word_list(dictionary) }
+      raise ArgumentError, 'Outside creativity range. Must be between 0 and 10.' if outside_creativity_bounds?
     end
 
-    generate_name(dictionaries)
-  end
+    def generate(seed: nil)
+      @seed = seed
+      generate_name(@dictionaries)
+    end
 
-  class << self
     private
+
+    def outside_creativity_bounds?
+      @creativity.negative? || @creativity > 10
+    end
 
     def match_word_list(dictionary)
       module_name = camelize_dictionary(dictionary)
@@ -146,7 +155,7 @@ module UniqueNamesGenerator
     end
 
     def raise_invalid_dictionary(dictionary)
-      raise ArgumentError, "Invalid dictionary: #{dictionary}"
+      raise ArgumentError, "Invalid dictionary #{dictionary}"
     end
 
     def format_with_separator(word)

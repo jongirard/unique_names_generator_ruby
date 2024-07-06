@@ -3,21 +3,25 @@
 require 'spec_helper'
 require 'unique_names_generator'
 
-RSpec.describe UniqueNamesGenerator do
-  describe '.generate' do
+RSpec.describe UniqueNamesGenerator::Generator do
+  describe '#generate' do
     it 'can generate a name with default config and packaged dictionary' do
-      expect(UniqueNamesGenerator.generate([:star_wars])).to be_a(String)
+      generator = described_class.new([:star_wars])
+
+      expect(generator.generate).to be_a(String)
     end
 
     it 'can generate a name with a custom dictionary only' do
       words = ['lorem', 'ipsum']
-      result = UniqueNamesGenerator.generate([words])
+      generator = described_class.new([words])
+      result = generator.generate
 
       expect(words).to include(result)
     end
 
     it 'can generate a name with multiple packaged dictionaries' do
-      result = UniqueNamesGenerator.generate([:colors, :adjectives])
+      generator = described_class.new([:colors, :adjectives])
+      result = generator.generate
 
       combined_list = (
         UniqueNamesGenerator::Dictionaries::Colors.list_all +
@@ -30,7 +34,8 @@ RSpec.describe UniqueNamesGenerator do
     end
 
     it 'can generate a name with numbers' do
-      result = UniqueNamesGenerator.generate([:colors, :numbers])
+      generator = described_class.new([:colors, :numbers])
+      result = generator.generate
 
       combined_list = (
         UniqueNamesGenerator::Dictionaries::Colors.list_all +
@@ -43,143 +48,136 @@ RSpec.describe UniqueNamesGenerator do
     end
 
     it 'can generate different random results' do
-      result1 = UniqueNamesGenerator.generate([:colors, :names])
-      result2 = UniqueNamesGenerator.generate([:colors, :names])
+      generator = described_class.new([:colors, :names])
+      result1 = generator.generate
+      result2 = generator.generate
 
       expect(result1).not_to eq(result2)
     end
 
     it 'can deterministically generate a word using multiple packaged dictionaries' do
-      result = UniqueNamesGenerator.generate(
-        [:adjectives, :animals, :numbers], seed: 'a5372f76-a4ad-483c-8e48-794caf1b26a0'
-      )
+      generator = described_class.new([:adjectives, :animals, :numbers])
+      result = generator.generate(seed: 'a5372f76-a4ad-483c-8e48-794caf1b26a0')
 
       expect(result).to eq('interesting_jaguar_446')
     end
 
     it 'can deterministically generate a word using multiple packaged and custom dictionaries' do
       drinks = ['Tea', 'Juice', 'Coffee']
-      result = UniqueNamesGenerator.generate(
-        [:adjectives, drinks, :numbers], seed: 'a5372f76-a4ad-483c-8e48-794caf1b26a0'
-      )
+      generator = described_class.new([:adjectives, drinks, :numbers])
+      result = generator.generate(seed: 'a5372f76-a4ad-483c-8e48-794caf1b26a0')
 
       expect(result).to eq('interesting_juice_446')
     end
 
     it 'raises an ArgumentError when a string dictionary reference is used' do
-      expect { UniqueNamesGenerator.generate(['colors', :adjectives]) }.to raise_error(
+      expect { described_class.new(['colors', :adjectives]) }.to raise_error(
         ArgumentError, 'Dictionary contains invalid dictionary type'
       )
     end
 
     it 'raises an ArgumentError when a non-dictionary atom is used' do
       typo = :numgberrs
-      expect { UniqueNamesGenerator.generate([:adjectives, typo]) }.to raise_error(
-        ArgumentError, "Invalid dictionary: #{typo}"
+      expect { described_class.new([:adjectives, typo]) }.to raise_error(
+        ArgumentError, "Invalid dictionary #{typo}"
       )
-    end
-
-    it 'calls generate_name_original when creativity is explicity 0' do
-      expect(UniqueNamesGenerator).to receive(:generate_name_original)
-
-      UniqueNamesGenerator.generate([:colors, :star_wars], creativity: 0)
-    end
-
-    it 'calls generate_name_original when creativity is default 0' do
-      expect(UniqueNamesGenerator).to receive(:generate_name_original)
-
-      UniqueNamesGenerator.generate([:colors, :star_wars])
-    end
-
-    it 'does not call generate_name_original when creativity is greater than 0' do
-      expect(UniqueNamesGenerator).not_to receive(:generate_name_original)
-      expect(UniqueNamesGenerator).to receive(:generate_name_creatively)
-
-      UniqueNamesGenerator.generate([:colors, :star_wars], creativity: 8)
     end
 
     it 'preserves original capitalization for words with non-letter characters' do
       mock_star_wars = ['R4-P17', 'Qui-Gon Jinn']
       mock_adjectives = ['leading', 'icy']
+      generator = described_class.new([mock_adjectives, mock_star_wars], style: :capital, separator: '-')
 
-      expect(
-        UniqueNamesGenerator.generate([mock_adjectives, mock_star_wars], style: :capital, separator: '-', seed: 'abc')
-      ).to eq('Icy-Qui-Gon-Jinn')
-
-      expect(
-        UniqueNamesGenerator.generate([mock_adjectives, mock_star_wars], style: :capital, separator: '-', seed: 'def')
-      ).to eq('Leading-R4-P17')
+      expect(generator.generate(seed: 'abc')).to eq('Icy-Qui-Gon-Jinn')
+      expect(generator.generate(seed: 'def')).to eq('Leading-R4-P17')
     end
   end
 
   describe 'seed-based generation' do
-    {
-      'hello' => 'azure_biggs_darklighter',
-      'b81e8f38-a7bf-44dc-bbc7-5c4eaacb0b04' => 'moccasin_owen_lars',
-      '79d06dff-6cc8-4cd0-a2ad-f2df3351c33c' => 'aquamarine_bib_fortuna'
-    }.each do |input, expected_output|
-      it "generates a predicted word based on a PRNG string seed of #{input}" do
-        expect(UniqueNamesGenerator.generate([:colors, :star_wars], seed: input)).to eq(expected_output)
+    let(:kwargs) {{ creativity: 0 }}
+    let(:dictionaries) {[:colors, :star_wars]}
+    let(:generator) { described_class.new(dictionaries, **kwargs) }
+
+    context 'when creativity is 0 with colors/star_wars dictionaries' do
+      {
+        'hello' => 'azure_biggs_darklighter',
+        'b81e8f38-a7bf-44dc-bbc7-5c4eaacb0b04' => 'moccasin_owen_lars',
+        '79d06dff-6cc8-4cd0-a2ad-f2df3351c33c' => 'aquamarine_bib_fortuna'
+      }.each do |input, expected_output|
+        it "generates a predicted word based on a PRNG string seed of #{input}" do
+          expect(generator.generate(seed: input)).to eq(expected_output)
+        end
       end
     end
 
-    {
-      'hello' => 'white_ki-adi-mundi',
-      'b81e8f38-a7bf-44dc-bbc7-5c4eaacb0b04' => 'violet_jango_fett',
-      '79d06dff-6cc8-4cd0-a2ad-f2df3351c33c' => 'teal_darth_maul'
-    }.each do |input, expected_output|
-      it "generates a predicted word based on a PRNG string seed of #{input} and creativity value of 8" do
-        expect(UniqueNamesGenerator.generate([:colors, :star_wars], seed: input, creativity: 8)).to eq(expected_output)
+    context 'when creativity is 0 with colors/animals dictionaries' do
+      let(:dictionaries) {[:colors, :animals]}
+
+      {
+        3 => 'blush_cow',
+        50 => 'magenta_mongoose',
+        5049483 => 'moccasin_ocelot'
+      }.each do |input, expected_output|
+        it "generates a predicted word based on a PRNG integer seed of #{input}" do
+          expect(generator.generate(seed: input)).to eq(expected_output)
+        end
       end
     end
 
-    {
-      3 => 'blush_cow',
-      50 => 'magenta_mongoose',
-      5049483 => 'moccasin_ocelot'
-    }.each do |input, expected_output|
-      it "generates a predicted word based on a PRNG integer seed of #{input}" do
-        expect(UniqueNamesGenerator.generate([:colors, :animals], seed: input)).to eq(expected_output)
+    context 'when creativity is 8 with colors/star_wars dictionaries' do
+      let(:kwargs) {{ creativity: 8 }}
+
+      {
+        'hello' => 'white_ki-adi-mundi',
+        'b81e8f38-a7bf-44dc-bbc7-5c4eaacb0b04' => 'violet_jango_fett',
+        '79d06dff-6cc8-4cd0-a2ad-f2df3351c33c' => 'teal_darth_maul'
+      }.each do |input, expected_output|
+        it "generates a predicted word based on a PRNG string seed of #{input}" do
+          expect(generator.generate(seed: input)).to eq(expected_output)
+        end
       end
     end
   end
 
   describe 'custom configurations' do
     it 'can generate a word using a custom separator string' do
-      expect(UniqueNamesGenerator.generate([:colors, :animals], seed: 'pigeon', separator: ' ')).to eq('rose sawfish')
+      generator = described_class.new([:colors, :animals], separator: ' ')
+      expect(generator.generate(seed: 'pigeon')).to eq('rose sawfish')
     end
 
     it 'can generate a word without spaces by setting separator to nil' do
-      expect(UniqueNamesGenerator.generate([:colors, :animals], seed: 'pigeon', separator: nil)).to eq('rosesawfish')
+      generator = described_class.new([:colors, :animals], separator: nil)
+      expect(generator.generate(seed: 'pigeon')).to eq('rosesawfish')
     end
 
     it 'can generate a word using a custom separator string and capitalized word style' do
-      expect(
-        UniqueNamesGenerator.generate([:colors, :animals], seed: 'pigeon', separator: ' ', style: :capital)
-      ).to eq('Rose Sawfish')
+      generator = described_class.new([:colors, :animals], separator: ' ', style: :capital)
+      expect(generator.generate(seed: 'pigeon')).to eq('Rose Sawfish')
     end
 
     it 'can generate a word using a custom separator string and uppercased word style' do
-      expect(
-        UniqueNamesGenerator.generate([:colors, :animals], seed: 'soccer', separator: '-', style: :uppercase)
-      ).to eq('LAVENDER-MARLIN')
+      generator = described_class.new([:colors, :animals], separator: '-', style: :uppercase)
+      expect(generator.generate(seed: 'soccer')).to eq('LAVENDER-MARLIN')
     end
   end
 
   describe 'creativity' do
     it 'raises an ArgumentError when creativity is out of range' do
-      expect { UniqueNamesGenerator.generate([:colors], creativity: 11) }.to raise_error(
+      expect { described_class.new([:colors], creativity: 11) }.to raise_error(
         ArgumentError, 'Outside creativity range. Must be between 0 and 10.'
       )
 
-      expect { UniqueNamesGenerator.generate([:colors], creativity: -1) }.to raise_error(
+      expect { described_class.new([:colors], creativity: -1) }.to raise_error(
         ArgumentError, 'Outside creativity range. Must be between 0 and 10.'
       )
     end
 
     it 'generates different results with different creativity levels' do
-      result1 = UniqueNamesGenerator.generate([:colors, :animals, :numbers], seed: 'test', creativity: 0)
-      result2 = UniqueNamesGenerator.generate([:colors, :animals, :numbers], seed: 'test', creativity: 5)
+      generator1 = described_class.new([:colors, :animals, :numbers], creativity: 0)
+      generator2 = described_class.new([:colors, :animals, :numbers], creativity: 5)
+      result1 = generator1.generate(seed: 'test')
+      result2 = generator2.generate(seed: 'test')
+
       expect(result1).not_to eq(result2)
     end
   end

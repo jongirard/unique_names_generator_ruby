@@ -27,5 +27,12 @@ Style/SymbolArray:
   Exclude:
     - 'spec/**/*'
 
+Layout/SpaceInsideBlockBraces:
+  Exclude:
+    - 'spec/**/*'
+
 Style/NumericPredicate:
   Enabled: false
+
+Metrics/ClassLength:
+  Max: 150
